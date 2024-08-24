@@ -23,6 +23,7 @@ namespace CAGD_Worshop
 
             transfornedPolygon.DrawPolygon(transfornedPolygon, 0.4);
 
+
             //p.Transformation(p, .3);
 
             //p.RotatePolygon(p, 75, .5);
