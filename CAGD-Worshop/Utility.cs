@@ -8,15 +8,29 @@ namespace CAGD_Worshop
 {
     public class Utility
     {
-        public static Polygon GetTransFormedPolygon(Polygon poly, double[,] tMatrix)
+        public static Polygon GetTransFormedPolygon(Polygon polygon, Point pointOfRotation, double rotationAngle = 0)
         {
-            Polygon nPoly = new Polygon();
-            foreach (var point in poly.points)
+            Polygon tPoly = new Polygon();
+            var tMatrix = GetTranslationMatrix(-pointOfRotation.x, -pointOfRotation.y);
+            foreach (var point in polygon.points)
             {
-                nPoly.points.Add(TranslatedPoint(point, tMatrix));
+                tPoly.points.Add(TranslatedPoint(point, tMatrix));
             }
 
-            return nPoly;
+            Polygon rPoly = new Polygon();
+            foreach (var point in tPoly.points)
+            {
+                rPoly.points.Add(RotatedPoint(point, GetRotationMatrix(rotationAngle)));
+            }
+
+            Polygon fPoly = new Polygon();
+            var fMatrix = GetTranslationMatrix(pointOfRotation.x, pointOfRotation.y);
+            foreach (var point in rPoly.points)
+            {
+                fPoly.points.Add(TranslatedPoint(point, fMatrix));
+            }
+
+            return fPoly;
         }
 
         public static Point TranslatedPoint(Point p, double[,] tMatrix)
@@ -40,6 +54,35 @@ namespace CAGD_Worshop
             };
 
             return translationMatrix;
+        }
+
+        public static double[,] GetRotationMatrix(double angle)
+        {
+            var angleInRad = AngleInRadians(angle);
+            double[,] rotationMatrix = new double[3, 3]
+            {
+                {Math.Cos(angleInRad), -Math.Sin(angleInRad), 0 },
+                {Math.Sin(angleInRad), Math.Cos(angleInRad), 0 },
+                {0,                 0,                      1 }
+            };
+
+            return rotationMatrix;
+        }
+
+        private static Point RotatedPoint(Point p, double[,] rMatrix)
+        {
+            double x = p.x;
+            double y = p.y;
+
+            double newX = rMatrix[0, 0] * x + rMatrix[0, 1] * y + rMatrix[0, 2];
+            double newY = rMatrix[1, 0] * x + rMatrix[1, 1] * y + rMatrix[1, 2];
+
+            return new Point(newX, newY);
+        }
+
+        private static double AngleInRadians(double angle)
+        {
+            return angle * (Math.PI / 180);
         }
     }
 }
