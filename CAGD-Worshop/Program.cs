@@ -18,10 +18,10 @@ namespace CAGD_Worshop
 
             Polygon p = new Polygon(new Point(1, 1), new Point(4, 1), new Point(4, 4), new Point(1, 4));
 
-            Polygon transfornedPolygon = Utility.GetTransFormedPolygon(p, Utility.GetTranslationMatrix(-2.5, -2.5));
+            Polygon transfornedPolygon = Utility.GetTransFormedPolygon(p, new Point(2.5, 2.5), 90);
 
 
-            transfornedPolygon.DrawPolygon(transfornedPolygon, 0.4);
+            transfornedPolygon.DrawPolygon(transfornedPolygon);
 
 
             //p.Transformation(p, .3);
