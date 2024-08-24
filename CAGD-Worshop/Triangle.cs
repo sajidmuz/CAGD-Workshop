@@ -8,9 +8,9 @@ namespace CAGD_Worshop
 {
     public class Triangle
     {
-        private Point p1;
-        private Point p2;
-        private Point p3;
+        public Point p1 { get; }
+        public Point p2 { get; }
+        public Point p3 { get; }
 
         public Triangle(Point p1, Point p2, Point p3)
         {
