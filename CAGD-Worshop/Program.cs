@@ -13,7 +13,9 @@ namespace CAGD_Worshop
             Console.WriteLine("Hello world");
             //Polygon p = new Polygon(new Point(0, 0), new Point(0, 5), new Point(5, 5), new Point(5, 0));
 
-            Polygon p = new Polygon(new Point(0, 0), new Point(0, 5), new Point(3, 8), new Point(6, 5), new Point(6, 0), new Point(3, -3));
+            //Polygon p = new Polygon(new Point(0, 0), new Point(0, 5), new Point(3, 8), new Point(6, 5), new Point(6, 0), new Point(3, -3));
+            Polygon p = new Polygon(new Point(0, 0), new Point(0, 5), new Point(3, 8), new Point(6, 5), new Point(6, 0));
+            //Polygon p = new Polygon(new Point(0, 0), new Point(0, 5), new Point(3, 8), new Point(6, 5), new Point(6, 0), new Point(3, -3), new Point(5, -8));
 
             p.DrawPolygon(p);
         }
