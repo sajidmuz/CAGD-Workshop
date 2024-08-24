@@ -10,9 +10,8 @@ namespace CAGD_Worshop
     public class Polygon
     {
         public List<Point> points = new List<Point>();
-        Point intersectionPoint = null; 
+        Point midPointOfPolygon = null; 
         private List<Triangle> listOfTriangles = new List<Triangle>();
-        private List<Line> listOfLines = new List<Line>();
         string fileDestination = "";
 
         public Polygon(params Point[] points)
@@ -24,13 +23,8 @@ namespace CAGD_Worshop
 
         public void DrawPolygon(Polygon poly, double maxAreaOfTriangle = 0.4)
         {
-            StoreListOfLines();
-
             File.WriteAllText(fileDestination, string.Empty);
-
-            /*WritePointsInAFile(poly.p1, dest);
-            WritePointsInAFile(poly.p2, dest);*/
-
+            var points = poly.points;
 
             foreach (var p in points)
             {
@@ -39,45 +33,7 @@ namespace CAGD_Worshop
 
             WritePointsInAFile(poly.points[0], fileDestination);
 
-            //DrawMeshOfTriangles(poly, fileDestination, maxAreaOfTriangle);
-        }
-
-        public void RotatePolygon(Polygon poly, float angle = 0, double maxAreaOfTriangle = 0.4)
-        {
-            File.WriteAllText(fileDestination, string.Empty);
-
-            /*WritePointsInAFile(poly.p1, dest);
-            WritePointsInAFile(poly.p2, dest);*/
-
-            List<Point> ListPoints = new List<Point>();
-
-            foreach (var p in points)
-            {
-                Point newPoint = new Point(Math.Round(p.x * Math.Cos(angle * (Math.PI / 180)), 4), p.y);
-                ListPoints.Add(newPoint);
-                //WritePointsInAFile(newPoint, fileDestination);
-            }
-            points = ListPoints;
-
-            foreach (var p in points)
-            {
-                Point newPoint = new Point(Math.Round(p.x * Math.Cos(angle * (Math.PI / 180)), 4), p.y);
-                WritePointsInAFile(newPoint, fileDestination);
-            }
-
-            WritePointsInAFile(poly.points[0], fileDestination);
-            DrawMeshOfTriangles(poly, fileDestination, maxAreaOfTriangle);
-        }
-
-        private void StoreListOfLines()
-        {
-            for (int i = 0; i < points.Count; i++)
-            {
-                if (i < points.Count - 1)
-                    listOfLines.Add(new Line(points[i], points[i + 1]));
-                else
-                    listOfLines.Add(new Line(points[i], points[0]));
-            }
+            //DrawMeshOfTriangles(poly ,points , fileDestination, maxAreaOfTriangle);
         }
 
         private void WritePointsInAFile(Point p, string fileDest)
@@ -85,72 +41,29 @@ namespace CAGD_Worshop
             File.AppendAllText(fileDest, p.x.ToString() + " " + p.y.ToString() + "\n");
         }
 
-        private void DrawMeshOfTriangles(Polygon poly, string fileDest, double maxAreaOfTriangle)
+        private void DrawMeshOfTriangles(Polygon poly,List<Point> points, string fileDest, double maxAreaOfTriangle)
         {
-            int midPointIndex = GetMidPointIndex(poly);
-
-            intersectionPoint = MidPointOfPolygon(poly);
+            midPointOfPolygon = MidPointOfPolygon(poly);
 
             foreach (var p in points)
             {
-                WritePointsInAFile(intersectionPoint, fileDest);
+                WritePointsInAFile(midPointOfPolygon, fileDest);
                 WritePointsInAFile(p, fileDest);
             }
 
-            StoreListOfTriangles();
+            StoreListOfTriangles(points, midPointOfPolygon);
             WritePointsInAFile(points[0], fileDestination);
             var newTriangles = TriangulateTheTriangles(listOfTriangles, maxAreaOfTriangle);
-            /*var nt = TriangulateTheTriangles(newTriangles);
-            var nt2 = TriangulateTheTriangles(nt);
-            TriangulateTheTriangles(nt2);*/
-
-
         }
 
-        private int GetMidPointIndex(Polygon poly)
-        {
-            int numberOfPoints = poly.points.Count;
-            int midPoint = 0;
-            
-            if(numberOfPoints % 2 == 0)
-            {
-                midPoint = (numberOfPoints) / 2;
-            }
-            else
-            {
-                midPoint = ((numberOfPoints) / 2) + 1;
-            }
-
-            return midPoint;
-        }
-
-        private Point GetIntersection(Line l1, Line l2)
-        {
-            double m1 = (l1.p2.y - l1.p1.y) / (l1.p2.x - l1.p1.x);
-            double m2 = (l2.p2.y - l2.p1.y) / (l2.p2.x - l2.p1.x);
-
-            if (m1 == m2)
-            {
-                return null;
-            }
-
-            double c1 = l1.p1.y - m1 * l1.p1.x;
-            double c2 = l2.p1.y - m2 * l2.p1.x;
-
-            double x = (c2 - c1) / (m1 - m2);
-            double y = m1 * x + c1;
-
-            return new Point(x, y);
-        }
-
-        private void StoreListOfTriangles()
+        private void StoreListOfTriangles(List<Point> points, Point midPointOfPolygon)
         {
             for (int i = 0; i < points.Count; i++)
             {
                 if (i < points.Count - 1)
-                    listOfTriangles.Add(new Triangle(intersectionPoint, points[i], points[i+1]));
+                    listOfTriangles.Add(new Triangle(midPointOfPolygon, points[i], points[i+1]));
                 else
-                    listOfTriangles.Add(new Triangle(intersectionPoint, points[i], points[0]));
+                    listOfTriangles.Add(new Triangle(midPointOfPolygon, points[i], points[0]));
             }
         }
 
@@ -241,56 +154,5 @@ namespace CAGD_Worshop
             return 0.5 * Math.Abs(t.p1.x * (t.p2.y - t.p3.y) + t.p2.x * (t.p3.y - t.p1.y) + t.p3.x * (t.p1.y - t.p2.y));
         }
 
-        public void Transformation(Polygon polygon, double maxAreaOfTriangle = 0.4)
-        {
-            ApplyTransformation(polygon, GetTransformationMatrix(), maxAreaOfTriangle);
-        }
-
-
-        public Polygon ApplyTransformation(Polygon polygon, double[,] matrix, double maxAreaOfTriangle)
-        {
-            Polygon transformedPolygon = new Polygon();
-            List<Point> transformedPoints = new List<Point>();
-
-            foreach (var p in polygon.points)
-            {
-                Point transformedPoint = TransformPoint(p, matrix);
-                transformedPoints.Add(transformedPoint);
-            }
-
-            points = transformedPoints;
-
-            DrawPolygon(polygon, maxAreaOfTriangle);
-
-            return transformedPolygon;
-        }
-
-        public Point TransformPoint(Point point, double[,] matrix)
-        {
-            double x = point.x;
-            double y = point.y;
-            double z = 0;
-
-            double newX = matrix[0, 0] * x + matrix[0, 1] * y + matrix[0, 2] * z + matrix[0, 3];
-            double newY = matrix[1, 0] * x + matrix[1, 1] * y + matrix[1, 2] * z + matrix[1, 3];
-            double newZ = matrix[2, 0] * x + matrix[2, 1] * y + matrix[2, 2] * z + matrix[2, 3];
-
-            return new Point(newX, newY);
-        }
-
-        public double[,] GetTransformationMatrix()
-        {
-            double[,] matrix_around_X_rotation = new double[4, 4]
-            {
-                { 1,    0,      0,          5 },
-                { 0,    0.5235, -0.5235,    7 },
-                { 0,    0.5235, 0.5235,     5 },
-                { 0,    0,      0,          1 }
-            };
-
-            return matrix_around_X_rotation;
-        }
-
-        
     }
 }
