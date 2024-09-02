@@ -1,3 +1,4 @@
+using CAGD_Worshop.CAGD_Polygon3d;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +29,15 @@ namespace CAGD_Worshop
 
             //p.Transformation(p, .03);\
             //p.RotatePolygon(p, 75, .5);
+
+
+            Polygon3d poly3d = new Polygon3d();
+            Polygon3d poly = poly3d.Get3dPolygon();
+
+            Polygon3d p3d = Utility.GetTransFormedPolygon3d(poly, 90);
+            p3d.DrawPolygon(p3d);
+
+            //poly.DrawPolygon(poly);
         }
     }
 }

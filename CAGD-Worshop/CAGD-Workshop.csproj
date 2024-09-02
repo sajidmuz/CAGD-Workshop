@@ -46,6 +46,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CAGD-Polygon3d\Line3d.cs" />
+    <Compile Include="CAGD-Polygon3d\Point3d.cs" />
+    <Compile Include="CAGD-Polygon3d\Polygon3d.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Point.cs" />
     <Compile Include="Polygon.cs" />
